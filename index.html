@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>席替え - 先生用</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #fff8f0;
+    }
+    h1 {
+      margin-top: 20px;
+    }
+    #seats {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      margin: 20px auto;
+      max-width: 600px;
+    }
+    .seat {
+      background: #ffffff;
+      border: 2px solid #999;
+      border-radius: 10px;
+      padding: 10px;
+      min-height: 60px;
+      box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
+    }
+    .seat.empty {
+      background: #f0f0f0;
+    }
+    #controls {
+      margin-top: 20px;
+    }
+    button {
+      padding: 8px 16px;
+      font-size: 16px;
+      margin: 0 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>現在の座席割り当て</h1>
+  <div id="seats"></div>
+  <div id="controls">
+    <button onclick="resetSeats()">リセット</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
