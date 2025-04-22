@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>座席管理</title>
+  <title>座席表示</title>
   <style>
     body {
       font-family: sans-serif;
@@ -28,9 +28,14 @@
       background: white;
       border: 2px solid #ccc;
       border-radius: 8px;
-      padding: 12px;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 5px;
+      text-align: center;
+      font-size: 14px;
+      box-sizing: border-box;
+      min-height: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .seat.filled {
@@ -55,7 +60,7 @@
 </head>
 <body>
 
-<h1>座席管理（先生用）</h1>
+<h1>黒板</h1>
 <div id="seats"></div>
 <button onclick="resetSeats()">全席リセット</button>
 
@@ -87,8 +92,13 @@
     seats.forEach((name, i) => {
       const div = document.createElement("div");
       div.className = "seat";
-      div.textContent = name ? `${i + 1}: ${name}` : `${i + 1}`;
-      if (name) div.classList.add("filled");
+      if (name) {
+        div.classList.add("filled");
+        div.innerHTML = `<strong>${i + 1}</strong><br>${name}`;
+      } else {
+        div.innerHTML = `<strong>${i + 1}</strong><br><span style="visibility:hidden">空</span>`;
+      }
+
       div.onclick = () => {
         if (name && confirm(`${i + 1}番を空席にしますか？`)) {
           ws.send(JSON.stringify({ type: "delete", seat: i }));
