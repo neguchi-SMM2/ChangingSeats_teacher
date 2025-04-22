@@ -1,53 +1,108 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>席替え - 先生用</title>
+  <meta charset="UTF-8">
+  <title>座席管理</title>
   <style>
     body {
       font-family: sans-serif;
+      margin: 0;
+      padding: 1rem;
+      background-color: #f5f5f5;
       text-align: center;
-      background: #fff8f0;
     }
+
     h1 {
-      margin-top: 20px;
+      margin-bottom: 1rem;
     }
+
     #seats {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
       gap: 10px;
-      margin: 20px auto;
-      max-width: 600px;
+      max-width: 800px;
+      margin: 0 auto 2rem auto;
     }
+
     .seat {
-      background: #ffffff;
-      border: 2px solid #999;
-      border-radius: 10px;
-      padding: 10px;
-      min-height: 60px;
-      box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
+      background: white;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    .seat.empty {
-      background: #f0f0f0;
+
+    .seat.filled {
+      background-color: #e8fbe8;
+      border-color: #4caf50;
     }
-    #controls {
-      margin-top: 20px;
-    }
+
     button {
-      padding: 8px 16px;
+      padding: 10px 20px;
       font-size: 16px;
-      margin: 0 8px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #d32f2f;
     }
   </style>
 </head>
 <body>
-  <h1>現在の座席割り当て</h1>
-  <div id="seats"></div>
-  <div id="controls">
-    <button onclick="resetSeats()">リセット</button>
-  </div>
 
-  <script src="script.js"></script>
+<h1>座席管理（先生用）</h1>
+<div id="seats"></div>
+<button onclick="resetSeats()">全席リセット</button>
+
+<script>
+  const ws = new WebSocket("wss://changingseats-server.onrender.com");
+  let seats = Array(42).fill(null);
+  const container = document.getElementById("seats");
+
+  ws.onopen = () => {
+    ws.send(JSON.stringify({ type: "getSeats" }));
+  };
+
+  ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    if (data.type === "seats") {
+      seats = data.data;
+    } else if (data.seat !== undefined) {
+      seats[data.seat] = data.name;
+    } else if (data.delete !== undefined) {
+      seats[data.delete] = null;
+    } else if (data.type === "reset") {
+      seats = Array(42).fill(null);
+    }
+    render();
+  };
+
+  function render() {
+    container.innerHTML = "";
+    seats.forEach((name, i) => {
+      const div = document.createElement("div");
+      div.className = "seat";
+      div.textContent = name ? `${i + 1}: ${name}` : `${i + 1}`;
+      if (name) div.classList.add("filled");
+      div.onclick = () => {
+        if (name && confirm(`${i + 1}番を空席にしますか？`)) {
+          ws.send(JSON.stringify({ type: "delete", seat: i }));
+        }
+      };
+      container.appendChild(div);
+    });
+  }
+
+  function resetSeats() {
+    if (confirm("本当に全席をリセットしますか？")) {
+      ws.send(JSON.stringify({ type: "reset" }));
+    }
+  }
+</script>
 </body>
 </html>
