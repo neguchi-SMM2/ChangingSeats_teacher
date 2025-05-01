@@ -4,115 +4,86 @@
   <meta charset="UTF-8">
   <title>最新鋭の席替えシステム</title>
   <style>
-    body {
-      font-family: sans-serif;
-      margin: 0;
-      padding: 1rem;
-      background-color:rgb(255, 239, 192);
-      text-align: center;
-    }
-
-    h1 {
-      margin-bottom: 1rem;
-    }
-
-    #seats {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 10px;
-      max-width: 800px;
-      margin: 0 auto 2rem auto;
-    }
-
-    .seat {
-      background: rgb(255, 249, 231);
-      border: 2px solid rgb(98, 86, 61);
-      border-radius: 8px;
-      padding: 0px;
-      text-align: center;
-      font-size: 18px;
-      box-sizing: border-box;
-      min-height: 50px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .seat.filled {
-      background-color: #e8fbe8;
-      border-color: #4caf50;
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #f44336;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #d32f2f;
-    }
+    body { font-family: sans-serif; background-color: #fff0c0; text-align: center; padding: 1rem; }
+    #seats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; max-width: 800px; margin: 1rem auto; }
+    .seat { background: #fff9e7; border: 2px solid #62563d; border-radius: 8px; min-height: 50px; display: flex; justify-content: center; flex-direction: column; font-size: 18px; }
+    .filled { background-color: #e8fbe8; border-color: #4caf50; }
+    button, select { padding: 10px; font-size: 16px; margin-top: 10px; }
   </style>
 </head>
 <body>
+  <h1>黒板</h1>
 
-<h1>黒板</h1>
-<div id="seats"></div>
-<button onclick="resetSeats()">最新鋭の全席リセットシステム</button>
+  <div id="classSelector">
+    <label>学年:
+      <select id="gradeSelect">
+        <option value="1">1年</option>
+        <option value="2">2年</option>
+        <option value="3">3年</option>
+      </select>
+    </label>
+    <label>組:
+      <select id="classSelect">
+        ${[...Array(9)].map((_, i) => `<option value="${i+1}">${i+1}組</option>`).join('')}
+      </select>
+    </label>
+    <button onclick="requestSeats()">表示</button>
+  </div>
 
-<script>
-  const ws = new WebSocket("wss://changingseats-server.onrender.com");
-  let seats = Array(42).fill(null);
-  const container = document.getElementById("seats");
+  <div id="seats"></div>
+  <button onclick="resetSeats()">全席リセット</button>
 
-  ws.onopen = () => {
-    ws.send(JSON.stringify({ type: "getSeats" }));
-  };
+  <script>
+    const ws = new WebSocket("wss://changingseats-server.onrender.com");
+    let seats = Array(42).fill(null);
+    const container = document.getElementById("seats");
+    const gradeSelect = document.getElementById("gradeSelect");
+    const classSelect = document.getElementById("classSelect");
 
-  ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    if (data.type === "seats") {
-      seats = data.data;
-    } else if (data.seat !== undefined) {
-      seats[data.seat] = data.name;
-    } else if (data.delete !== undefined) {
-      seats[data.delete] = null;
-    } else if (data.type === "reset") {
-      seats = Array(42).fill(null);
+    function getClassName() {
+      return `${gradeSelect.value}-${classSelect.value}`;
     }
-    render();
-  };
 
-  function render() {
-    container.innerHTML = "";
-    seats.forEach((name, i) => {
-      const div = document.createElement("div");
-      div.className = "seat";
-      if (name) {
-        div.classList.add("filled");
-        div.innerHTML = `<strong><font size="4">${i + 1}</font></strong><br>${name}`;
-      } else {
-        div.innerHTML = `<strong><font size="4">${i + 1}</font></strong><br><span style="visibility:hidden">空</span>`;
-      }
+    function requestSeats() {
+      ws.send(JSON.stringify({ type: "getSeats", className: getClassName() }));
+    }
 
-      div.onclick = () => {
-        if (name && confirm(`${i + 1}番を空席にしますか？`)) {
-          ws.send(JSON.stringify({ type: "delete", seat: i }));
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.className !== getClassName()) return;
+
+      if (data.type === "seats") seats = data.data;
+      else if (data.seat !== undefined) seats[data.seat] = data.name;
+      else if (data.delete !== undefined) seats[data.delete] = null;
+      else if (data.type === "reset") seats = Array(42).fill(null);
+      render();
+    };
+
+    function render() {
+      container.innerHTML = "";
+      seats.forEach((name, i) => {
+        const div = document.createElement("div");
+        div.className = "seat";
+        if (name) {
+          div.classList.add("filled");
+          div.innerHTML = `<strong>${i + 1}</strong><br>${name}`;
+        } else {
+          div.innerHTML = `<strong>${i + 1}</strong><br><span style="visibility:hidden">空</span>`;
         }
-      };
-      container.appendChild(div);
-    });
-  }
-
-  function resetSeats() {
-    if (confirm("本当に全席をリセットしますか？")) {
-      ws.send(JSON.stringify({ type: "reset" }));
+        div.onclick = () => {
+          if (name && confirm(`${i + 1}番を空席にしますか？`)) {
+            ws.send(JSON.stringify({ type: "delete", seat: i, className: getClassName() }));
+          }
+        };
+        container.appendChild(div);
+      });
     }
-  }
-</script>
+
+    function resetSeats() {
+      if (confirm("本当に全席をリセットしますか？")) {
+        ws.send(JSON.stringify({ type: "reset", className: getClassName() }));
+      }
+    }
+  </script>
 </body>
 </html>
