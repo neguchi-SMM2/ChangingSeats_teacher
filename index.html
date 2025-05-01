@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>最新鋭の席替えシステム</title>
+  <title>黒板（先生用）</title>
   <style>
     body { font-family: sans-serif; background-color: #fff0c0; text-align: center; padding: 1rem; }
     #seats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; max-width: 800px; margin: 1rem auto; }
@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-  <h1>黒板</h1>
+  <h1>座席管理（先生用）</h1>
 
   <div id="classSelector">
     <label>学年:
@@ -23,9 +23,7 @@
       </select>
     </label>
     <label>組:
-      <select id="classSelect">
-        ${[...Array(9)].map((_, i) => `<option value="${i+1}">${i+1}組</option>`).join('')}
-      </select>
+      <select id="classSelect"></select>
     </label>
     <button onclick="requestSeats()">表示</button>
   </div>
@@ -34,11 +32,18 @@
   <button onclick="resetSeats()">全席リセット</button>
 
   <script>
+    const classSelect = document.getElementById("classSelect");
+    for (let i = 1; i <= 9; i++) {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = `${i}組`;
+      classSelect.appendChild(opt);
+    }
+
     const ws = new WebSocket("wss://changingseats-server.onrender.com");
     let seats = Array(42).fill(null);
     const container = document.getElementById("seats");
     const gradeSelect = document.getElementById("gradeSelect");
-    const classSelect = document.getElementById("classSelect");
 
     function getClassName() {
       return `${gradeSelect.value}-${classSelect.value}`;
