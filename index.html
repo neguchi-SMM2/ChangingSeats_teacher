@@ -4,11 +4,67 @@
   <meta charset="UTF-8">
   <title>最新鋭の席替えシステム</title>
   <style>
-    body { font-family: sans-serif; background-color: #fff0c0; text-align: center; padding: 1rem; }
-    #seats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; max-width: 800px; margin: 1rem auto; }
-    .seat { background: #fff9e7; border: 2px solid #62563d; border-radius: 8px; min-height: 50px; display: flex; justify-content: center; flex-direction: column; font-size: 18px; }
-    .filled { background-color: #e8fbe8; border-color: #4caf50; }
-    button, select { padding: 10px; font-size: 16px; margin-top: 10px; }
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 1rem;
+      background-color:rgb(255, 239, 192);
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 1rem;
+    }
+
+    #seats {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      max-width: 800px;
+      margin: 0 auto 2rem auto;
+    }
+
+    .seat {
+      background: rgb(255, 249, 231);
+      border: 2px solid rgb(98, 86, 61);
+      border-radius: 8px;
+      padding: 0px;
+      text-align: center;
+      font-size: 18px;
+      box-sizing: border-box;
+      min-height: 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .seat.filled {
+      background-color: #e8fbe8;
+      border-color: #4caf50;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #d32f2f;
+    }
+
+    select {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+      color: #333;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
