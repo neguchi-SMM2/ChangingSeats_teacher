@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>黒板（先生用）</title>
+  <title>最新鋭の席替えシステム</title>
   <style>
     body { font-family: sans-serif; background-color: #fff0c0; text-align: center; padding: 1rem; }
     #seats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; max-width: 800px; margin: 1rem auto; }
@@ -12,7 +12,9 @@
   </style>
 </head>
 <body>
-  <h1>座席管理（先生用）</h1>
+  <h1>黒板</h1>
+
+  <div id="seats"></div>
 
   <div id="classSelector">
     <label>学年:
@@ -28,8 +30,7 @@
     <button onclick="requestSeats()">表示</button>
   </div>
 
-  <div id="seats"></div>
-  <button onclick="resetSeats()">全席リセット</button>
+  <button onclick="resetSeats()">最新鋭の全席リセットシステム</button>
 
   <script>
     const classSelect = document.getElementById("classSelect");
