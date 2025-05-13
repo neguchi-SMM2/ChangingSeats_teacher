@@ -43,6 +43,11 @@
       border-color: #4caf50;
     }
 
+    .seat.filled.locked {
+      background-color: #bbbbbb;
+      border-color: #303030;
+    }
+
     button {
       padding: 10px 20px;
       font-size: 16px;
@@ -135,9 +140,15 @@
         } else {
           div.innerHTML = `<strong>${i + 1}</strong><br><span style="visibility:hidden">空</span>`;
         }
+        if (name === "locked") {
+          div.classList.add("locked");
+        }
         div.onclick = () => {
           if (name && confirm(`${i + 1}番を空席にしますか？`)) {
             ws.send(JSON.stringify({ type: "delete", seat: i, className: getClassName() }));
+          }
+          else if(!name && confirm(`${i + 1}番をロックしますか？`)) {
+            ws.send(JSON.stringify({ seat: i, name: "locked", className: getClassName() }));
           }
         };
         container.appendChild(div);
