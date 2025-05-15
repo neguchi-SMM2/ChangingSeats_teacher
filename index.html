@@ -145,7 +145,7 @@
       classSelect.appendChild(opt);
     }
 
-    const hint = 'Edit Seat Data - ws.send(JSON.stringify({ seat: i, name: "example", className: getClassName() }));\n You can specify grades and classes out of range in the editor but it does not work correctly.\n We recommend that you write the className directly in the request to the server.'
+    const hint = 'Edit Seat Data - ws.send(JSON.stringify({ seat: i, name: "example", className: getClassName() }));\n\nYou can specify grades and classes out of range in the editor but it does not work correctly.\nWe recommend that you write the className directly in the request to the server.'
     const ws = new WebSocket("wss://changingseats-server.onrender.com");
     let seats = Array(42).fill(null);
     const container = document.getElementById("seats");
