@@ -145,7 +145,7 @@
       classSelect.appendChild(opt);
     }
 
-    const hint = 'Edit Seat Data - ws.send(JSON.stringify({ seat: i, name: "example", className: getClassName() }));'
+    const hint = 'Edit Seat Data - ws.send(JSON.stringify({ seat: i, name: "example", className: getClassName() }));\n You can specify grades and classes out of range in the editor but it does not work correctly.\n We recommend that you write the className directly in the request to the server.'
     const ws = new WebSocket("wss://changingseats-server.onrender.com");
     let seats = Array(42).fill(null);
     const container = document.getElementById("seats");
@@ -157,7 +157,7 @@
     require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } });
     require(['vs/editor/editor.main'], function () {
       editor = monaco.editor.create(document.getElementById('editor'), {
-        value: `// enter "console.log(hint) to get the hints`,
+        value: `// enter "console.log(hint)" to get the hints`,
         language: 'javascript',
         theme: 'vs-dark',
         automaticLayout: true,
