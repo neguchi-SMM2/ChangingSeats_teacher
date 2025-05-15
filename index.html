@@ -71,7 +71,26 @@
       color: #333;
       font-size: 16px;
     }
+
+    #editor {
+      width: 100%;
+      height: 70vh;
+    }
+
+    #controls {
+      padding: 10px;
+    }
+
+    #output {
+      padding: 10px;
+      background: #f0f0f0;
+      border-top: 1px solid #ccc;
+      height: 20vh;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
 </head>
 <body>
   <h1>黒板</h1>
@@ -95,6 +114,12 @@
 
   <button onclick="resetSeats()">最新鋭の全席リセットシステム</button><br>
   <a href="https://github.com/neguchi-SMM2/ChangingSeats_teacher/wiki">つかいかた</a>
+  
+  <div id="editor"></div>
+  <div id="controls">
+    <button onclick="runCode()">実行</button>
+  </div>
+  <div id="output"></div>
 
   <script>
     const classSelect = document.getElementById("classSelect");
@@ -109,6 +134,18 @@
     let seats = Array(42).fill(null);
     const container = document.getElementById("seats");
     const gradeSelect = document.getElementById("gradeSelect");
+
+    let editor;
+
+    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } });
+    require(['vs/editor/editor.main'], function () {
+      editor = monaco.editor.create(document.getElementById('editor'), {
+        value: `// ここにJavaScriptコードを書いてください`,
+        language: 'javascript',
+        theme: 'vs-dark',
+        automaticLayout: true
+      });
+    });
 
     function getClassName() {
       return `${gradeSelect.value}-${classSelect.value}`;
@@ -159,6 +196,34 @@
       if (confirm("本当に全席をリセットしますか？")) {
         ws.send(JSON.stringify({ type: "reset", className: getClassName() }));
       }
+    }
+
+    function runCode() {
+      const code = editor.getValue();
+      const output = document.getElementById('output');
+      output.textContent = ''; // Clear previous output
+
+      const log = console.log;
+      const err = console.error;
+      const logs = [];
+
+      // Capture console.log
+      console.log = (...args) => {
+        logs.push(args.join(' '));
+        log.apply(console, args);
+      };
+
+      try {
+        const result = eval(code);
+        if (result !== undefined) logs.push(String(result));
+      } catch (e) {
+        logs.push('エラー: ' + e.message);
+      }
+
+      output.textContent = logs.join('\n');
+
+      console.log = log;
+      console.error = err;
     }
   </script>
 </body>
