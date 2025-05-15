@@ -72,23 +72,35 @@
       font-size: 16px;
     }
 
-    #editor {
+    #editor-container {
       width: 75%;
+      margin: 2rem auto;
+      text-align: left;
+    }
+
+    #editor {
+      width: 100%;
       height: 35vh;
+      border: 1px solid #ccc;
     }
 
     #controls {
-      padding: 10px;
+      margin-top: 10px;
     }
 
     #output {
+      margin-top: 10px;
       padding: 10px;
       background: #f0f0f0;
       border-top: 1px solid #ccc;
       height: 20vh;
       overflow-y: auto;
       white-space: pre-wrap;
+      width: 100%;
+      text-align: left;
+      box-sizing: border-box;
     }
+
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
 </head>
@@ -115,11 +127,13 @@
   <button onclick="resetSeats()">最新鋭の全席リセットシステム</button><br>
   <a href="https://github.com/neguchi-SMM2/ChangingSeats_teacher/wiki">つかいかた</a>
   
+  <div id="editor-container">
   <div id="editor"></div>
   <div id="controls">
     <button onclick="runCode()">実行</button>
   </div>
-  <div id="output">Ctrl+Eでエディタを開閉します。</div>
+  <div id="output"></div>
+</div>
 
   <script>
     const classSelect = document.getElementById("classSelect");
