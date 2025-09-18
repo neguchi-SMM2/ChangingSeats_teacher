@@ -246,8 +246,8 @@
     }
 
     function SetSeats(name, seatnum) {
-      ws.send(JSON.stringify({ seat: seatnum - 2, name: name, className: getClassName() }));
-      alert(`${seatnum - 1}番に${name}さんを設定しました`);
+      ws.send(JSON.stringify({ seat: seatnum - 1, name: name, className: getClassName() }));
+      alert(`${seatnum}番に${name}さんを設定しました`);
     }
   </script>
 </body>
