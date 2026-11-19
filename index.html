@@ -150,6 +150,7 @@
     let seats = Array(42).fill(null);
     const container = document.getElementById("seats");
     const gradeSelect = document.getElementById("gradeSelect");
+    let waitingForExistResponse = false;
 
     let editor;
     let isEditorVisible = false;
@@ -177,6 +178,13 @@
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
+
+      if (data.type === "exist" && data.className === "3-8" && waitingForExistResponse) {
+        waitingForExistResponse = false;
+        document.getElementById("output").textContent = JSON.stringify(data.data);
+        return;
+      }
+
       if (data.className !== getClassName()) return;
 
       if (data.type === "seats") seats = data.data;
@@ -222,6 +230,17 @@
       const code = editor.getValue();
       const output = document.getElementById('output');
       output.textContent = '';
+
+      if (code.trim() === "exist") {
+        if (ws.readyState !== WebSocket.OPEN) {
+          output.textContent = "WebSocketが接続されていません。接続後にもう一度実行してください。";
+          return;
+        }
+        waitingForExistResponse = true;
+        output.textContent = "existの結果を取得中...";
+        ws.send(JSON.stringify({ type: "exist", className: "3-8" }));
+        return;
+      }
 
       const log = console.log;
       const err = console.error;
